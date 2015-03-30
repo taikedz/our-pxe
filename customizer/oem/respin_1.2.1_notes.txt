@@ -1,0 +1,16 @@
+line 34 - wtf is this? disabling root on the main host....??
+
+line 333 - user and group copyovers
+
+What on earth are they up to...??
+
+Also, is shadow not copied over?
+
+
+line 478 - what is happening here......?
+
+
+
+respin line 502 - there is a comment about thge live CD's user - is it a dev note (TODO) or a comment on what they're going to do later....?
+
+It seems a part was omitted here hence the LiveCD user not being created properly
