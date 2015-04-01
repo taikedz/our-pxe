@@ -1,4 +1,4 @@
-Using Remastersys/respin to create a custom ISO
+# Using Remastersys/respin to create a custom ISO
 
 The following notes are regarding creating a custom install CD for an Ubuntu-based system, with as little time spent at command line as possible.
 
@@ -54,6 +54,10 @@ Recommended base set of software for maintainers:
 
 Beyond these, you have the option of using the Lubuntu Software Centre, or the Synaptic Package Manager at this point (both available under Start > System Tools), or you can use a terminal and use apt-get.
 
+For the Partimus project, the following are relevant:
+
+	libreoffice chromium-browser gimp krita openshot blender audacity scribus geany inkscape vlc flashplugin-installer
+
 As root, you can add files to the /etc/skel folder; any file in the /etc/skel folder will be copied into any subsequently newly created user. Customize user default settings through this.
 
 If you are using a virtual machine, shut it down instead at this point, and take a snaptshot; then start it again.
@@ -70,6 +74,10 @@ Then use dpkg to install respin from deb. You can get a copy of respin from my g
 
 	git clone https://github.com/taikedz/remastersys
 	dpkg -i remastersys/respin-master/respin_1.2.1/respin_1.2.1_all.deb
+
+Note - I have reviewed the code of the respin script, and have done some cleanup on it. It is available through https://github.com/taikedz/our-pxe repo, in customizer/respin.sh
+
+Copy that script to /usr/bin/respin.sh and replace any "respin" commands below with "respin.sh" instead
 
 In a terminal, as root, run
 
@@ -89,13 +97,16 @@ If you need to clear out customizations from a previous attempt, use
 
 This will remove the previous customization session.
 
-[/home/respin/respin/partimus.iso .* ready to be burned or tested in a virtual machine]
-
-4/ ISO is ready
+# 4/ ISO is ready
 
 You can now use the custom install CD to set up your other computers.
 
+Burn it to a CD or copy it to a USB stick, or serve it over the network.
+
+When installing, do the following:
+
 1. Setup the standard user as an administrator. When first prompted to create a user at first reboot, this will already be the case, so call the user something like "(school name)-admin"
+
 2. Once logged into the desktop, create a new user "student" with a password; do NOT grant admin privileges.
 
 All the computers installed with this custom ISO will have the customizations you set previsouly during OEM mode. When booting from this CD, opt to immediately install. An issue with the LiveCD user creation prevents any live users from being created, so you can't do much with it. I'll look into this as a post-project task.
