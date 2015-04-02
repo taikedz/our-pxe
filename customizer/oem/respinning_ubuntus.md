@@ -8,6 +8,10 @@ This CD customization procedure will eventually be aimed at non-technical person
 
 Tai -- 2015/03/29
 
+# Knownn issues
+
+14.04 - the respinning procedure [disables DNS](https://help.ubuntu.com/community/LiveCDCustomization#line-86) (due to change in 14.04's structure) After install, need to symlink /etc/resolv.conf -> /run/resolvconf/resolv.conf and restart networking / reboot.
+
 # Pre requisites
 
 Recommended hardware / spec for VM guest

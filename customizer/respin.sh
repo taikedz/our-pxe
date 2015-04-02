@@ -6,6 +6,16 @@
 #
 # This version is a dev version. Don't use in prod!
 # =================================================
+#
+# FIXME - an issue with the proceudre in 14.04 results in loss of DNS
+# at some point, need to add a line to link /etc/resolv.conf -> /run/resolvconf/resolv.conf
+#
+# FIXME - an issue with the default user creation exists - the default user is not created
+# for the LiveCD preventing any useful demonstration of the capabilities, and installing from Live
+
+
+
+# ==================
 
 # respin script to make an installable livecd/dvd from an (XK)Ubuntu installed 
 # and customized system
@@ -27,7 +37,7 @@
 # THESE DIRECTORIES MUST BE CHANGED 
 
 # EDITS by Tai Kedzierski marked @TK
-# Some major cleanup for readability first.
+# NOTES by Tai Kedzierski marked TAIK
 
 . /etc/respin/respin.version
 
