@@ -66,24 +66,29 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin
 . /lib/lsb/init-functions
 
 do_start() {
-        #REM302
-        if [[ "\$(cat /proc/cmdline | grep casper)" = "" ]]; then
-            [[ "\$VERBOSE" != no ]] && log_begin_msg "Running respin-firstboot"
-            (sleep 60 && update-rc.d -f respin-firstboot remove) &
-            sed -i -e 's/root:x:/root:!:/g' /etc/shadow # what?
-            rm -rf /home/*/Desktop/ubiquity*.desktop
-            #Place your custom commands below this line
+	# First task - reactivate networking
+	ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
+	#REM302
+	if [[ "\$(cat /proc/cmdline | grep casper)" = "" ]]; then
+		[[ "\$VERBOSE" != no ]] && log_begin_msg "Running respin-firstboot"
+		sleep 60 && update-rc.d -f respin-firstboot remove) &
+		#sed -i -e 's/root:x:/root:!:/g' /etc/shadow
+		rm -rf /home/*/Desktop/ubiquity*.desktop
+		#Place your custom commands below this line
 
-            #Place your custom commands above this line
-            ES=\$?
-            [[ "\$VERBOSE" != no ]] && log_end_msg \$ES
-            return \$ES
-        fi
-
-        
-
-
-} 
+		#Place your custom commands above this line
+		ES=\$?
+		[[ "\$VERBOSE" != no ]] && log_end_msg \$ES
+		return \$ES
+	else # Live CD
+		passwd << EOPASS
+partimus
+partimus
+EOPASS
+		useradd -m partimus
+		echo -e "partimus\\tALL=(ALL:ALL) ALL" >> /etc/sudoers
+	fi
+}
 
 case "\$1" in
     start)
