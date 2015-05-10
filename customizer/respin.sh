@@ -48,8 +48,10 @@
 # and fix for recovery mode
 
 # @TK TODO - cleaned some up - but no idea WHAT this is doing....
-if [[ -z $(grep "REM302" /etc/init.d/respin-firstboot) ]]; then
-    cat > /etc/init.d/respin-firstboot <<FOO
+
+# @TK deactivating - write new script with every build!
+#if [[ -z $(grep "REM302" /etc/init.d/respin-firstboot) ]]; then
+cat > /etc/init.d/respin-firstboot <<FOO
 #! /bin/sh
 ### BEGIN INIT INFO
 # Provides:          respin-firstboot
@@ -65,11 +67,27 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin
 . /lib/init/vars.sh
 . /lib/lsb/init-functions
 
-do_start() {
-	# First task - reactivate networking
+echo "Running script $(date +%F_%T) at runlevel $(runlevel) with options [$@]" >> /etc/respin-boot
+chmod a+r /etc/respin-boot
+
+[[ -f /etc/resolv.conf ]] || {
 	ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
+}
+
+[[ -z "$(cat /et/passwd | grep 'partimus-admin' )" ]] || {
+	useradd -m partimus-admin
+	passwd partimus-admin << EOPASS
+partimus
+partimus
+EOPASS
+	echo -e "partimus-admin\\tALL=(ALL:ALL) ALL" >> /etc/sudoers
+}
+
+
+do_start() {
 	#REM302
 	if [[ "\$(cat /proc/cmdline | grep casper)" = "" ]]; then
+		echo "Found casper $(date +%F_%T) at runlevel $(runlevel)" >> /etc/respin-boot
 		[[ "\$VERBOSE" != no ]] && log_begin_msg "Running respin-firstboot"
 		sleep 60 && update-rc.d -f respin-firstboot remove) &
 		#sed -i -e 's/root:x:/root:!:/g' /etc/shadow
@@ -81,12 +99,7 @@ do_start() {
 		[[ "\$VERBOSE" != no ]] && log_end_msg \$ES
 		return \$ES
 	else # Live CD
-		passwd << EOPASS
-partimus
-partimus
-EOPASS
-		useradd -m partimus
-		echo -e "partimus\\tALL=(ALL:ALL) ALL" >> /etc/sudoers
+		echo "Casper is not here $(date +%F_%T) at runlevel $(runlevel)" >> /etc/respin-boot
 	fi
 }
 
@@ -108,7 +121,7 @@ esac
 
 FOO
 
-fi
+#fi # if exists respin-firstboot
 
 
 # load the respin.conf file 
