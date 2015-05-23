@@ -17,7 +17,7 @@ spinme=/home/$SUDO_USER/Desktop/SpinMe.desktop
 cat <<EOD > $spinme
 [Desktop Entry]
 Exec=/home/partimus/.dtopspin.sh
-Terminal=false
+Terminal=true
 Type=Application
 Name=Respin
 Comment=helpUse/Partimus respin automator
