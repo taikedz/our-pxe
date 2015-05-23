@@ -1,0 +1,10 @@
+/etc/respin.conf
+/etc/respin/isolinux/splash.png
+/etc/respin/isolinux/isolinux.cfg.vesamenu
+/etc/respin/plymouth/respin-theme/respin.png
+/etc/respin/plymouth/respin-theme/progress_box.png
+/etc/respin/plymouth/respin-theme/progress_bar.png
+/etc/respin/plymouth/respin-theme/respin-theme.plymouth
+/etc/respin/plymouth/respin-theme/respin-theme.script
+/etc/respin/respin.version
+/etc/respin/preseed/custom.seed

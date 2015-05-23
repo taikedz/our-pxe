@@ -71,23 +71,23 @@ PATH=/sbin:/usr/sbin:/bin:/usr/bin:/usr/local/bin:/usr/local/sbin
 # Shim fixes.
 
 respinlog=/var/log/respin.log
-touch $respinlog
-chmod a+r $respinlog
+touch \$respinlog
+chmod a+r \$respinlog
 
-echo "Running script $(date +%F_%T) at runlevel $(runlevel) with options [$@]" >> $respinlog
+echo "Running script \$(date +%F_%T) at runlevel \$(runlevel) with options [\$@]" >> \$respinlog
 
 [[ -f /etc/resolv.conf ]] || {
 	ln -s /run/resolvconf/resolv.conf /etc/resolv.conf
 }
 
 pwdanchor=/root/pwdreset
-[[ -f $pwdanchor ]] || {
-	echo "Resetting Partimus root password $(date +%F %T)"
+[[ -f \$pwdanchor ]] || {
+	echo "Resetting Partimus root password \$(date +'%F %T')"
 	passwd << EOPASS
 partaggiamo
 partaggiamo
 EOPASS
-	echo "Delete this file to reset the root password." >> $pwdanchor
+	echo "Delete this file to reset the root password." >> \$pwdanchor
 }
 
 # @TK -------------------------------------------/
@@ -95,7 +95,7 @@ EOPASS
 
 do_start() {
 	if [[ "\$(cat /proc/cmdline | grep casper)" = "" ]]; then
-		echo "Found casper $(date +%F_%T) at runlevel $(runlevel)" >> $respinlog
+		echo "Found casper \$(date +%F_%T) at runlevel \$(runlevel)" >> \$respinlog
 		[[ "\$VERBOSE" != no ]] && log_begin_msg "Running respin-firstboot"
 		sleep 60 && update-rc.d -f respin-firstboot remove) &
 		#sed -i -e 's/root:x:/root:!:/g' /etc/shadow
@@ -107,7 +107,7 @@ do_start() {
 		[[ "\$VERBOSE" != no ]] && log_end_msg \$ES
 		return \$ES
 	else # Live CD
-		echo "Casper is not here $(date +%F_%T) at runlevel $(runlevel)" >> $respinlog
+		echo "Casper is not here \$(date +%F_%T) at runlevel \$(runlevel)" >> \$respinlog
 	fi
 }
 

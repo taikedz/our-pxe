@@ -1,0 +1,13 @@
+src/respin usr/bin
+src/respin-skelcopy usr/bin
+src/isolinux.cfg.vesamenu etc/respin/isolinux
+src/respin-theme.plymouth etc/respin/plymouth/respin-theme
+src/respin-theme.script etc/respin/plymouth/respin-theme
+src/custom.seed etc/respin/preseed
+src/respin.version etc/respin
+etc/respin.conf etc
+images/splash.png etc/respin/isolinux
+images/progress_bar.png etc/respin/plymouth/respin-theme
+images/progress_box.png etc//respin/plymouth/respin-theme
+images/respin.png etc/respin/plymouth/respin-theme
+man/man1/respin.1 usr/share/man/man1
