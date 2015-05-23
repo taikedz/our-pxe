@@ -10,12 +10,16 @@ apt-get install brasero gksu zenity --assume-yes
 mkdir /partimus
 chmod a+rw /partimus
 
-cat <<EOD > /home/$SUDO_USER/Desktop/SpinMe.desktop
+spinme=/home/$SUDO_USER/Desktop/SpinMe.desktop
+
+cat <<EOD > $spinme
 [Desktop Entry]
 Exec=/root/our-pxe/bin/dtopspin.sh
 Terminal=false
 Type=Application
 Name=Respin
 Comment=helpUse/Partimus respin automator
-# set up exectuable to run /root/our-pxe/bin/dtopspin.sh
 EOD
+
+chmod a+x $spinme
+chown $SUDO_USER:$SUDO_USER $spinme
