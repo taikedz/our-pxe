@@ -6,12 +6,6 @@
 #
 # This version is a dev version. Don't use in prod!
 # =================================================
-#
-# FIXME - an issue with the proceudre in 14.04 results in loss of DNS
-# at some point, need to add a line to link /etc/resolv.conf -> /run/resolvconf/resolv.conf
-#
-# FIXME - an issue with the default user creation exists - the default user is not created
-# for the LiveCD preventing any useful demonstration of the capabilities, and installing from Live
 
 
 
@@ -46,8 +40,6 @@
 
 #create respin-firstboot script if it doesn't exist and populate with at least removal of the ubiquity*.desktop file from users Desktop
 # and fix for recovery mode
-
-# @TK TODO - cleaned some up - but no idea WHAT this is doing....
 
 # @TK deactivating - write new script with every build!
 #if [[ -z $(grep "REM302" /etc/init.d/respin-firstboot) ]]; then
@@ -196,8 +188,9 @@ See http://remastersys.org for more information
 =======================================
 EOM
 
-read -p "Proceed all the same? y/N>" CONTINUERES
-[[ $CONTINUERES != 'y' ]] && [[ $CONTINUERES != 'Y' ]] && exit 1
+# - switching it off.
+#read -p "Proceed all the same? y/N>" CONTINUERES
+#[[ $CONTINUERES != 'y' ]] && [[ $CONTINUERES != 'Y' ]] && exit 1
 # ===================================================
 
 
