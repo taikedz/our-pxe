@@ -11,7 +11,9 @@ chmod a+r $respinlog
 
 [[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
 	
-	dpkg -i "/root/our-pxe/respin_1.2.1/respin_1.2.1_all.deb"
+	[[ ! -f /etc/respin/respin.version ]] && {
+		dpkg -i "/root/our-pxe/respin_1.2.1/respin_1.2.1_all.deb"
+	}
 
 	# We copy the .mozilla configuration folder.
 	# This script is only really to be used as per the accompanying instructions
@@ -38,8 +40,8 @@ chmod a+r $respinlog
 	dtime=$(date +%F_%T | sed -r -e 's/(-|:)/./g' -e 's/_/-/')
 	$hurs/respin.sh dist "partimus-$dtime.iso" >> $respinlog 2>&1
 
-	su $1 -c "xdg-open /home/respin" &
+	su $1 -c "xdg-open /home/respin/respin" &
 
 	cp $respinglog /home/$1/respin-report.log
-	zenity --text-info --title="Respin" --text="Your new installation CD image is ready."
+	zenity --info --title="Respin" --text="Your new installation CD image is ready."
 }
