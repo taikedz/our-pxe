@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
-[[ $UID != 0 ]] && {
+[[ $UID = 0 ]] || {
 	gksudo $0
 	exit
 }
