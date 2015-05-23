@@ -74,6 +74,11 @@ echo "Running script \$(date +%F_%T) at runlevel \$(runlevel) with options [\$@]
 
 pwdanchor=/root/pwdreset
 [[ -f \$pwdanchor ]] || {
+	useradd -m -U -s /bin/bash partimus
+	passwd partimus <<EOF
+let's share
+let's share
+EOF
 	echo "Resetting Partimus root password \$(date +'%F %T')"
 	passwd << EOPASS
 partaggiamo
@@ -311,8 +316,10 @@ log_msg "$WORKDIR is on a $DIRTYPE filesystem"
     [[ -n $(grep lightdm /etc/X11/default-display-manager) ]] &&
     [[ ! -f /etc/lightdm/lightdm.conf ]] &&
     [[ ! -f /usr/share/xsessions/ubuntu.desktop ]] && {
-    	log_msg "Lightdm not setup properly. You must set your default desktop with lightdm prior to remastering"
-    	exit 1
+    	#log_msg "Lightdm not setup properly. You must set your default desktop with lightdm prior to remastering"
+    	#exit 1
+	apt-get install lightdm --assume-yes # @TK no reason why we shouldn't for our purposes.
+	touch /etc/lightdm/lightdm.conf
     }
 
     # prevent the installer from changing the apt sources.list
