@@ -1,5 +1,10 @@
 #!/bin/sh
 
+[[ $UID != 0 ]] && {
+	gksudo $0
+	exit
+}
+
 apt-get install brasero gksu zenity --assume-yes
 
 mkdir /partimus
