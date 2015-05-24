@@ -11,7 +11,7 @@ chmod a+r $respinlog
 
 [[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
 	
-	x-terminal-emulator -c "tail -f $respinlog" # display the progress log, otherwise it looks like we're not doing anything...!
+	su $SUDO_USER -c "x-terminal-emulator -c \"tail -f $respinlog\"" # display the progress log, otherwise it looks like we're not doing anything...!
 
 	[[ ! -f /etc/respin/respin.version ]] && {
 		dpkg -i "/root/our-pxe/respin_1.2.1/respin_1.2.1_all.deb"
