@@ -1,18 +1,28 @@
 #!/bin/bash
 
 [[ $UID != 0 ]] && {
-	gksudo $0 $(whoami)
-	exit
+	# we need to do this here because the X session is not inherited
+	[[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
+		$0 log
+		gksudo $0 install
+		zenity --info --title="Respin" --text="Your new installation CD image is ready."
+	}
 }
 
 respinlog=/root/respin.log
 touch $respinlog
 chmod a+r $respinlog
 
-[[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
-	
-	su $SUDO_USER -c "x-terminal-emulator -c \"tail -f $respinlog\"" # display the progress log, otherwise it looks like we're not doing anything...!
+# ======= Shims to open displays as thye user
 
+[[ $1 = 'log' ]] && {
+	x-terminal-emulator -c "tail -f $respinlog" &
+}
+
+#=======
+
+
+[[ $1 = "install" ]] && {
 	[[ ! -f /etc/respin/respin.version ]] && {
 		dpkg -i "/root/our-pxe/respin_1.2.1/respin_1.2.1_all.deb"
 	}
@@ -45,5 +55,4 @@ chmod a+r $respinlog
 	su $SUDO_USER -c "xdg-open /home/respin/respin" &
 
 	cp $respinlog /home/$SUDO_USER/respin-report.log
-	zenity --info --title="Respin" --text="Your new installation CD image is ready."
 }
