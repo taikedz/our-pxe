@@ -32,16 +32,15 @@ cd /root
 git clone https://github.com/taikedz/our-pxe
 
 mkdir -p /partimus
-ln -s /root/our-pxe/bin/dtopspin.sh /home/partimus/.dtopspin.sh
-chmod -R a+rw /partimus
+cp /root/our-pxe/bin/dtopspin.sh /home/$SUDO_USER/.dtopspin.sh
+chmod a+rwx /partimus
 chmod a+rx /home/$SUDO_USER/.dtopspin.sh
 
 spinme=/home/$SUDO_USER/Desktop/SpinMe.desktop
 
 cat <<EOD > $spinme
 [Desktop Entry]
-Exec=/home/partimus/.dtopspin.sh
-Terminal=true
+Exec=/home/$SUDO_USER/.dtopspin.sh
 Type=Application
 Name=Make Partimus CD
 Comment=helpUse/Partimus respin automator
