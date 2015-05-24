@@ -1,7 +1,7 @@
 #!/bin/bash
 
 [[ $UID != 0 ]] && {
-	gksu $0 $(whoami)
+	gksudo $0 $(whoami)
 	exit
 }
 
@@ -11,6 +11,8 @@ chmod a+r $respinlog
 
 [[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
 	
+	x-terminal-emulator -c "tail -f $respinlog" # display the progress log, otherwise it looks like we're not doing anything...!
+
 	[[ ! -f /etc/respin/respin.version ]] && {
 		dpkg -i "/root/our-pxe/respin_1.2.1/respin_1.2.1_all.deb"
 	}
@@ -18,7 +20,7 @@ chmod a+r $respinlog
 	# We copy the .mozilla configuration folder.
 	# This script is only really to be used as per the accompanying instructions
 	# NOT on your own long-in-the-tooth installation...!
-	cp /home/$1/{.config,.mozilla} /etc/skel >> $respinlog 2>&1
+	cp /home/$SUDO_USER/{.config,.mozilla} /etc/skel/ >> $respinlog 2>&1
 
 	# Update in case the user doesn't know to
 	apt-get update >> $respinlog 2>&1
@@ -40,8 +42,8 @@ chmod a+r $respinlog
 	dtime=$(date +%F_%T | sed -r -e 's/(-|:)/./g' -e 's/_/-/')
 	$hurs/respin.sh dist "partimus-$dtime.iso" >> $respinlog 2>&1
 
-	su $1 -c "xdg-open /home/respin/respin" &
+	su $SUDO_USER -c "xdg-open /home/respin/respin" &
 
-	cp $respinglog /home/$1/respin-report.log
+	cp $respinlog /home/$SUDO_USER/respin-report.log
 	zenity --info --title="Respin" --text="Your new installation CD image is ready."
 }
