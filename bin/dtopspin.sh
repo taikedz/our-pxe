@@ -26,6 +26,10 @@ respinlog=/var/log/respin.log
 	# We copy the .mozilla configuration folder.
 	# This script is only really to be used as per the accompanying instructions
 	# NOT on your own long-in-the-tooth installation...!
+	for target in .config .mozilla; do
+		target=/etc/skel/$target
+		[[ -d "$target" ]] && [[ "$target" =! "/etc/skel/" ]] && { rm -rf $target; }
+	done
 	cp -rv /home/$SUDO_USER/{.config,.mozilla} /etc/skel/ >> $respinlog 2>&1
 	rm /etc/skel/.config/user-dirs.{dirs,locale}
 
