@@ -16,12 +16,11 @@ Once booted into the freshly installed system, some initial technical preparatio
 
 Open a browser and download the following: http://helpuse.com/download/partimus.tar
 
-Save the file to your Downloads folder in your home folder.
+Save the file to your Downloads folder in your home folder. Go to your downloads folder in your normal folder explorer, right-click on the partimus.tar folder, and choose "Extract here"
 
 Open a terminal by using the keyboard shortcut [Ctrl + Alt + T] and then type the following lines, presing the Return key for each new line:
 
 	cd Downloads
-	tar xf partimus.tar
 	./partimus-setup.sh
 
 Some messages will fly by on the screen; once you see the message saying that setup is finished, you can close the terminal.
