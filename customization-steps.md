@@ -1,4 +1,4 @@
-# Steps to install
+# Steps to Customize Ubuntu
 
 ## 1/ Install Ubuntu as per normal
 
@@ -44,7 +44,7 @@ Note: if you want to set your own desktop background that every user in the new 
 	* save the picture to : File System (choose this in the list on the left): partimus
 	* then customize your desktop background to use that same file.
 
-[insert screenshots]
+There is a script in the Partimus Easy Install setup that also adds a full suite of office and media applications; if you don't want it, remove the file `/root/our-pxe/bin/school-apps.sh`
 
 ## 3/ Create the custom installation CD
 
