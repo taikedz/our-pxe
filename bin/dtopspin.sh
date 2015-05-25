@@ -27,6 +27,7 @@ respinlog=/var/log/respin.log
 	# This script is only really to be used as per the accompanying instructions
 	# NOT on your own long-in-the-tooth installation...!
 	cp -r /home/$SUDO_USER/{.config,.mozilla} /etc/skel/ >> $respinlog 2>&1
+	rm /etc/skel/.config/user-dirs.{dirs,locale}
 
 	# Update in case the user doesn't know to
 	apt-get update >> $respinlog 2>&1
