@@ -35,6 +35,7 @@ mkdir -p /partimus
 cp /root/our-pxe/bin/dtopspin.sh /home/$SUDO_USER/.dtopspin.sh
 chmod a+rwx /partimus
 chmod a+rx /home/$SUDO_USER/.dtopspin.sh
+chown $SUDO_USER /home/$SUDO_USER/.dtopspin.sh
 
 spinme=/home/$SUDO_USER/Desktop/SpinMe.desktop
 

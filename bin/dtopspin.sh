@@ -1,5 +1,16 @@
 #!/bin/bash
 
+respinlog=/root/respin.log
+touch $respinlog
+chmod a+r $respinlog
+
+# ======= Shims to open displays as the user
+
+[[ $1 = 'log' ]] && {
+	x-terminal-emulator -c "tail -f $respinlog" &
+	exit
+}
+
 [[ $UID != 0 ]] && {
 	# we need to do this here because the X session is not inherited
 	[[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
@@ -9,15 +20,6 @@
 	}
 }
 
-respinlog=/root/respin.log
-touch $respinlog
-chmod a+r $respinlog
-
-# ======= Shims to open displays as thye user
-
-[[ $1 = 'log' ]] && {
-	x-terminal-emulator -c "tail -f $respinlog" &
-}
 
 #=======
 
