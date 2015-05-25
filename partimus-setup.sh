@@ -49,3 +49,12 @@ EOD
 
 chmod a+x $spinme
 chown $SUDO_USER:$SUDO_USER $spinme
+
+
+cat <<EOF
+
+Partimus easy-respin setup done.
+
+You can now customize your Ubuntu LInux installation!
+
+EOF
