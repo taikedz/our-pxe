@@ -16,6 +16,8 @@ chmod a+r $respinlog
 	[[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
 		$0 log
 		gksudo $0 install
+		xdg-open /home/respin/respin &
+
 		zenity --info --title="Respin" --text="Your new installation CD image is ready."
 	}
 }
@@ -53,8 +55,6 @@ chmod a+r $respinlog
 	# Create that ISO!
 	dtime=$(date +%F_%T | sed -r -e 's/(-|:)/./g' -e 's/_/-/')
 	$hurs/respin.sh dist "partimus-$dtime.iso" >> $respinlog 2>&1
-
-	su $SUDO_USER -c "xdg-open /home/respin/respin" &
 
 	cp $respinlog /home/$SUDO_USER/respin-report.log
 }
