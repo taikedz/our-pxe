@@ -1,20 +1,11 @@
 #!/bin/bash
 
 respinlog=/var/log/respin.log
-touch $respinlog
-chmod a+r $respinlog
-
-# ======= Shims to open displays as the user
-
-[[ $1 = 'log' ]] && {
-	x-terminal-emulator -c "tail -f $respinlog" &
-	exit
-}
 
 [[ $UID != 0 ]] && {
 	# we need to do this here because the X session is not inherited
 	[[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
-		$0 log
+		x-terminal-emulator -e "tail -n 0 -f $respinlog" &
 		gksudo $0 install $(whoami)
 		xdg-open /home/respin/respin &
 
@@ -35,7 +26,7 @@ chmod a+r $respinlog
 	# We copy the .mozilla configuration folder.
 	# This script is only really to be used as per the accompanying instructions
 	# NOT on your own long-in-the-tooth installation...!
-	cp /home/$SUDO_USER/{.config,.mozilla} /etc/skel/ >> $respinlog 2>&1
+	cp -r /home/$SUDO_USER/{.config,.mozilla} /etc/skel/ >> $respinlog 2>&1
 
 	# Update in case the user doesn't know to
 	apt-get update >> $respinlog 2>&1
