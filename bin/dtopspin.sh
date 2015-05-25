@@ -15,7 +15,7 @@ chmod a+r $respinlog
 	# we need to do this here because the X session is not inherited
 	[[ 0 = $(zenity --question --title="Respin" --text="WARNING - we will now proceed to building the default system setup.\n\nDo you wish to proceed?" ; echo $?) ]] && {
 		$0 log
-		gksudo $0 install
+		gksudo $0 install $(whoami)
 		xdg-open /home/respin/respin &
 
 		zenity --info --title="Respin" --text="Your new installation CD image is ready."
@@ -30,6 +30,7 @@ chmod a+r $respinlog
 	[[ ! -f /etc/respin/respin.version ]] && {
 		dpkg -i "/root/our-pxe/respin_1.2.1/respin_1.2.1_all.deb"
 	}
+	SUDO_USER=$2
 
 	# We copy the .mozilla configuration folder.
 	# This script is only really to be used as per the accompanying instructions
