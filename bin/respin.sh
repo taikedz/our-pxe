@@ -41,8 +41,6 @@
 #create respin-firstboot script if it doesn't exist and populate with at least removal of the ubiquity*.desktop file from users Desktop
 # and fix for recovery mode
 
-# @TK deactivating - write new script with every build!
-#if [[ -z $(grep "REM302" /etc/init.d/respin-firstboot) ]]; then
 cat > /etc/init.d/respin-firstboot <<FOO
 #! /bin/sh
 ### BEGIN INIT INFO
@@ -73,12 +71,22 @@ echo "Running script \$(date +%F_%T) at runlevel \$(runlevel) with options [\$@]
 }
 
 pwdanchor=/root/pwdreset
-[[ -f \$pwdanchor ]] || {
+partuser=/root/partuser
+[[ -f \$partuser ]] || {
+	echo "Recreating default partimus user"
+	[[ -d /home/partimus ]] && {
+		rm -rf /home/partimus
+		userdel partimus
+	}
+	echo "Delete this file to erase and re-create the default partimus user." >> \$partuser
 	useradd -m -U -s /bin/bash partimus
 	passwd partimus <<EOF
 let's share
 let's share
 EOF
+}
+
+[[ -f \$pwdanchor ]] || {
 	echo "Resetting Partimus root password \$(date +'%F %T')"
 	passwd << EOPASS
 partaggiamo
@@ -88,46 +96,11 @@ EOPASS
 }
 
 # @TK -------------------------------------------/
+#sleep 60 && update-rc.d -f respin-firstboot remove &
+#rm -rf /home/*/Desktop/ubiquity*.desktop
 
-
-do_start() {
-	if [[ "\$(cat /proc/cmdline | grep casper)" = "" ]]; then
-		echo "Found casper \$(date +%F_%T) at runlevel \$(runlevel)" >> \$respinlog
-		[[ "\$VERBOSE" != no ]] && log_begin_msg "Running respin-firstboot"
-		sleep 60 && update-rc.d -f respin-firstboot remove) &
-		#sed -i -e 's/root:x:/root:!:/g' /etc/shadow
-		rm -rf /home/*/Desktop/ubiquity*.desktop
-		#Place your custom commands below this line
-
-		#Place your custom commands above this line
-		ES=\$?
-		[[ "\$VERBOSE" != no ]] && log_end_msg \$ES
-		return \$ES
-	else # Live CD
-		echo "Casper is not here \$(date +%F_%T) at runlevel \$(runlevel)" >> \$respinlog
-	fi
-}
-
-case "\$1" in
-    start)
-        do_start
-        ;;
-    restart|reload|force-reload)
-        echo "Error: argument '\$1' not supported" >&2
-        exit 3
-        ;;
-    stop)
-        ;;
-    *)
-        echo "Usage: \$0 start|stop" >&2
-        exit 3
-        ;;
-esac
 
 FOO
-
-#fi # if exists respin-firstboot
-
 
 # load the respin.conf file 
 RESPCONF=/etc/respin.conf
