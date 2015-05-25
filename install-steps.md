@@ -49,12 +49,10 @@ Note: if you want to set your own desktop background that every user in the new 
 
 ## 3/ Create the custom installation CD
 
-On your desktop there is a program called "Make Partimus CD" - open it to launch the creation process. [this will look like nothing is happening; open a terminal and run `tail -f /root/respin.log` to see what's happening]
+On your desktop there is a program called "Make Partimus CD" - open it to launch the creation process. [if a progress terminal does not open to show you current activity, it will look like nothing is happening; open a terminal and run `tail -f /var/log/respin.log` to see what's happening]
 
 When the CD is ready, you will see a window open where the CD's .ISO file has been created.
 
-[note - need to add log monitoring task application...]
-
 You will also see the respin.log report on your desktop.
 
-You can now burn this ISO file to a writable DVD using the Brasero application.
+You can now burn this ISO file to a writable DVD using the Brasero application installed in your Applications menu.
