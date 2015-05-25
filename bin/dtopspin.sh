@@ -1,6 +1,6 @@
 #!/bin/bash
 
-respinlog=/root/respin.log
+respinlog=/var/log/respin.log
 touch $respinlog
 chmod a+r $respinlog
 
