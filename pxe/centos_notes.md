@@ -147,7 +147,7 @@ Edit `/var/ftp/pub/ks.cfg` and add these lines:
         services --enabled=NetworkManager, sshd
         eula --agreed
         #FTP location
-        url --url="ftp://192.168.1.132/pub/"
+        url --url="ftp://192.168.1.199/pub/"
 
         bootloader --location=mbr
         zerombr
