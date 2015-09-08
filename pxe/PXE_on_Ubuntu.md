@@ -109,8 +109,8 @@ Copy the boot images to /tftpboot
 
 This allows the unattended install of the system
 
-	mkdir /var/www/ks
-	vim /var/www/ks/ubuntu1504x32.cfg
+	mkdir /var/www/html/ks
+	vim /var/www/html/ks/ubuntu1504x32.cfg
 
 Note - the URL must specify the IP address - using the server's network name will likely fail without extra DNS setup
 
@@ -139,7 +139,7 @@ Note - the URL must specify the IP address - using the server's network name wil
 
 Ensure it can be read by the web server
 
-	chmod a+r /var/www/ubuntu15.04/ks.cfg
+	chmod a+r /var/www/html/ks/ubuntu1504x32.cfg
 
 ## Create a PXE boot menu
 
