@@ -10,7 +10,7 @@ If this is a VM, you need to ensure this is on a Bridged adapter, so that other 
 
 ## Install required packages
 
-	apt install isc-dhcp-server tftp tftpd apache2 syslinux
+	apt install isc-dhcp-server tftp tftpd apache2 syslinux nfs-kernel-server
 
 The DHCP server allows the target PXE client to get an IP from our server specifically - not sure if this is a requirement for the PXE broadcast to be recognized...
 
@@ -98,6 +98,16 @@ Or you can full-on copy the contents as appropriate
 
 Check that you have the `/mnt/dists` directory as provided by the DVD. If you do not, you will need to copy them through from the same architecture and release DVD for Ubuntu Server
 
+### NEW INSTRUCTIONS - NFS
+
+mkdir /srv/install
+vim /etc/exports
+
+# add:
+    /srv/install   192.168.1.0/24(ro,async,no_root_squash,no_subtree_check) 
+
+where 192.168.1.0/24 is the base network IP
+
 ## Get the network boot kernel and image
 
 Copy the boot images to /tftpboot
@@ -154,6 +164,10 @@ Edit `/tftpboot/pxelinux.cfg/default`
 	MENU LABEL Ubuntu 15.04
 	KERNEL kernels15.04x32/vmlinuz
 	APPEND initrd=kernels15.04x32/initrd.lz instrepo=http://192.168.1.199/ubuntu15.04 ks=http://192.168.1.199/ks/ubuntu1504x32.cfg boot=casper
+
+### NEW INSTUCTIONS - NFS
+
+APPEND initrd=kernels15.04x32/initrd.lz boot=casper netboot=nfs nfsroot=192.168.1.199:/srv/install/
 
 ## Restart the services
 
