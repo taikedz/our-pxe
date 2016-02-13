@@ -14,6 +14,10 @@ These instructions should work foro the most part though, and I'll be looking at
 
 I did the deployment of the PXE server itself on a Ubuntu 14.04 server i386 in VirtualBox 4.3.34 ; and chose to deploy a Ubuntu 15.04 i386 ISO image arbitrarily.
 
+For networking, you need NAT Internal during PXE booting; you can use NAT regular so as to be able to pull from the internet. I need to test using both a NAT Internal and a NAT at the same time on the server instance to see if taht works, but I see no reason why not.
+
+Use the IP address of the NAT Internal for the DHCP configuration. Typically in VirtualBox this will be `10.0.2.*`
+
 ## Firewall requirements
 
 You SHOULD be doing this on an internal network so firewall security should not need to be too stringent. That being said if you want to be sure, you need to allow INPUT on at least port 69 (tftpd) and the file server port (80 for the example below, served over HTTP), and port 67 (DHCP); you will also need to allow ports 111 and 2049 for the NFS server.
