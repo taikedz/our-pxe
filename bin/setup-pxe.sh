@@ -87,7 +87,9 @@ function distroslug {
 }
 
 function debuge {
-	[[ "$VERBOSE" = yes ]] && echo -e "\033[0;36m$@\033[0m"
+	if [[ "$VERBOSE" = yes ]]; then
+		echo -e "\033[0;36m$@\033[0m"
+	fi
 }
 
 function warne {
@@ -291,6 +293,7 @@ debuge "Get DVD contents"
 
 if [[ "$ISOMODE" = mount ]]; then
 	debuge "ISO mode: mount"
+	mkdir "/srv/install/$DSLUG"
 	mount -o loop "$ISOFILE" "/srv/install/$DSLUG"
 else
 	debuge "ISO mode: copy"
