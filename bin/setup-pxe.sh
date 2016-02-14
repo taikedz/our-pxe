@@ -27,7 +27,7 @@ ISOMODE=mount # copy or mount iso contents?
 function printhelp {
 cat <<EOHELP
 
-$(basename $0) -distro DISTRONAME -iso PATH -
+$(basename $0) -distro DISTRONAME -iso PATH
 
 Parameters
 
@@ -75,7 +75,7 @@ EOHELP
 ippat='^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
 function validip {
 	[[ ! "$1" =~ $ippat ]] && return 1
-	for x in $(echo "$1"|sed 's/./ /'); do
+	for x in $(echo "$1"|sed 's/\./ /g'); do
 		[[ "$x" -gt 255 ]] && return 1
 	done
 	return 0
