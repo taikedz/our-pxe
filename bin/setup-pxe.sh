@@ -157,6 +157,10 @@ case "$ARG" in
 --iso-mount)
 	ISOMODE=mount
 	;;
+--help)
+	printhelp
+	exit 0
+	;;
 esac
 done
 
@@ -195,7 +199,6 @@ if [[ "$REPLY" != yes ]]; then
 	exit 127
 fi
 
-exit
 # =============
 
 debuge "Install required packages"
