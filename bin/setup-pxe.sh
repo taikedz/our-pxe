@@ -76,9 +76,10 @@ ippat='^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
 function validip {
 	[[ ! "$1" =~ $ippat ]] && return 1
 	for x in $(echo "$1"|sed 's/\./ /g'); do
-		[[ "$x" -gt 255 ]] && return 1
+		[[ "$x" -gt 255 ]] && { echo "no"; return 1; }
 	done
-	return 0
+	echo "yes"
+	return 0 # why does this not work?
 }
 
 function distroslug {
@@ -103,7 +104,7 @@ ARG=$1 ; shift
 case "$ARG" in
 -netmask)
 	NETMASK="$1"
-	if [[ ! $(validip "$1") ]]; then
+	if [[ $(validip "$1") != yes ]]; then
 		faile "Invalid network mask: $1"
 		exit 2
 	fi
@@ -111,7 +112,7 @@ case "$ARG" in
 	;;
 -ip)
 	SERVERIP="$1"
-	if [[ ! $(validip "$1") ]]; then
+	if [[ $(validip "$1") != yes ]]; then
 		faile "Invalid server IP: $1"
 		exit 2
 	fi
@@ -119,7 +120,7 @@ case "$ARG" in
 	;;
 -lo)
 	RANGELO="$1"
-	if [[ ! $(validip "$1") ]]; then
+	if [[ $(validip "$1") != yes ]]; then
 		faile "Invalid lower range: $1"
 		exit 2
 	fi
@@ -127,7 +128,7 @@ case "$ARG" in
 	;;
 -hi)
 	RANGEHI="$1"
-	if [[ ! $(validip "$1") ]]; then
+	if [[ $(validip "$1") != yes ]]; then
 		faile "Invalid upper range: $1"
 		exit 2
 	fi
