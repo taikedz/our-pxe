@@ -163,7 +163,7 @@ Note - the URL must specify the IP address - using the server's network name wil
 	auth --useshadow --enablemd5
 	services --enabled=NetworkManager, sshd
 	eula --agreed
-	url --url="http://192.168.1.199/ubuntu15.04" # FIXME leftover from apache-based instructions. not sure how to poitn this at NFS share
+	nfs --server="192.168.1.199" --dir="/srv/install"
 
 	bootloader --location=mbr
 	zerombr
