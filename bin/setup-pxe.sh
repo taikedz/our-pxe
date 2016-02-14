@@ -280,7 +280,7 @@ mkdir /tftpboot/pxelinux.cfg
 mkdir /tftpboot/netboot
 
 # ==============
-debuge "NFS kernerl server setup"
+debuge "NFS kernel server setup"
 
 mkdir /srv/install
 echo "/srv/install   ${IPBASE}.0/24(ro,async,no_root_squash,no_subtree_check)" >> /etc/exports
@@ -372,4 +372,4 @@ debuge "Restart services"
 
 service isc-dhcp-server restart
 service xinetd restart
-service nfs-kerner-server restart
+service nfs-kernel-server restart
