@@ -10,14 +10,67 @@ NETMASK=255.255.255.0
 RANGELO=
 RANGEHI=
 
+ROOTPASS='$1$hw4S1wQ8$0GDzXkLWhlSQ.F8YsBO.n/' # need to custom-generate this interactively
+
 ISOFILE=
 DISTRO=
 DSLUG=
+
+KERNEL=
+BOOTIMG=
 
 VERBOSE=no
 ISOMODE=mount # copy or mount iso contents?
 
 # ===========================================
+
+function printhelp {
+cat <<EOHELP
+
+$(basename $0) -distro DISTRONAME -iso PATH -
+
+Parameters
+
+Required
+	-distro "Distro Name"
+		Pretty name of Distro
+
+	-iso PATH
+		Path to ISO file to serve
+
+Optional
+
+	-netmask NETMASK
+		specify the network mask
+		default: 255.255.255.0
+
+	-ip IPADDR
+		specify the IP of the current server
+		default: first non-localhost address found via ifconfig listing
+
+	-lo IPADDR
+		lower of range of IP space for DHCP
+		default: using the IPADDR, x.x.x.1
+
+	-hi IPADDR
+		higher of range of IP space for DHCP
+		default: using the IPADDR, x.x.x.255
+
+Mode switches
+
+	--iso-mount
+		Causes the ISO contents simply to be mounted
+		
+	--isocopy
+		Causes the ISO contents to be copied to local disk
+
+	--verbose
+		Enable verbose/debug mode
+
+	--help
+		Prints this help
+EOHELP
+}
 
 ippat='^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
 function validip {
@@ -50,18 +103,34 @@ ARG=$1 ; shift
 case "$ARG" in
 -netmask)
 	NETMASK="$1"
+	if [[ ! $(validip "$1") ]]; then
+		faile "Invalid network mask: $1"
+		exit 2
+	fi
 	shift
 	;;
 -ip)
 	SERVERIP="$1"
+	if [[ ! $(validip "$1") ]]; then
+		faile "Invalid server IP: $1"
+		exit 2
+	fi
 	shift
 	;;
 -lo)
 	RANGELO="$1"
+	if [[ ! $(validip "$1") ]]; then
+		faile "Invalid lower range: $1"
+		exit 2
+	fi
 	shift
 	;;
 -hi)
 	RANGEHI="$1"
+	if [[ ! $(validip "$1") ]]; then
+		faile "Invalid upper range: $1"
+		exit 2
+	fi
 	shift
 	;;
 -distro)
@@ -70,6 +139,10 @@ case "$ARG" in
 	;;
 -iso)
 	ISOFILE="$1"
+	if [[ ! -f "$1" ]]; then
+		faile "Not a file: $1"
+		exit 3
+	fi
 	DSLUG=$(distroslug $(basename "$ISOFILE"))
 	shift
 	;;
@@ -98,14 +171,29 @@ if [[ -z "$RANGEHI" ]] || [[ -z "$RANGELO" ]]; then
 	RANGEHI="$IPBASE".255
 fi
 
+
+if [[ -z "$DISTRO" ]] || [[ -z "$ISOFILE" ]]; then
+	faile "You need to specify a Distro name and an ISO file"
+	exit 1
+fi
+
 cat <<EOF
+Here is a summary of what will be installed:
+
 SERVERIP=$SERVERIP
 IPBASE=$IPBASE
 NETMASK=$NETMASK
 RANGELO=$RANGELO
 RANGEHI=$RANGEHI
-DISTRO=$DISTO
+DISTRO=$DISTRO
 EOF
+
+read -p "Continue ? yes/NO> "
+
+if [[ "$REPLY" != yes ]]; then
+	faile "Answer not 'yes' -- aborting."
+	exit 127
+fi
 
 exit
 # =============
@@ -114,7 +202,7 @@ debuge "Install required packages"
 apt-get install isc-dhcp-server tftp tftpd apache2 syslinux nfs-kernel-server --assume-yes
 
 # =============
-debuge "Dns setup"
+debuge "DNS setup"
 mv /etc/dhcp/dhcpd.conf{,.bak}
 
 dbuge "$(ls /etc/dhcp)"
@@ -191,6 +279,7 @@ debuge "NFS kernerl server setup"
 mkdir /srv/install
 echo "/srv/install   ${IPBASE}.0/24(ro,async,no_root_squash,no_subtree_check)" >> /etc/exports
 
+# TODO adapt for systemd
 service nfs-kernel-server start
 
 # ==============
@@ -211,3 +300,69 @@ fi
 if [[ ! -d "/srv/install/$DSLUG/dists" ]]; then
 	warne "You do not have the '/dists' directory in your install folder; Ubuntu installation may fail"
 fi
+
+# ==============
+debuge "Get kernel and initrd image"
+
+mkdir "/tftpboot/$DSLUG"
+KERNEL=$(basename $(ls /srv/install/vmlinu*))
+BOOTIMG=$(basename $(ls /srv/install/initrd*))
+cp /srv/install/$KERNEL /srv/install/$BOOTIMG "/tftpboot/$DSLUG"
+
+# ==============
+debuge "Make kickstart file"
+
+mkdir /var/www/html/ks
+
+cat <<EOKSFILE > /var/www/html/ks/"$DSLUG"
+install
+lang en_GB.UTF-8
+keyboard uk
+timezone Europe/London
+auth --useshadow --enablemd5
+services --enabled=NetworkManager, sshd
+eula --agreed
+nfs --server="192.168.1.199" --dir="/srv/install"
+
+bootloader --location=mbr
+zerombr
+clearpart --all --initlabel
+part swap --asprimary --fstype="swap" --size=1024
+part /boot --fstype xfs --size=200
+part pv.01 --size=1 --grow
+volgroup rootvg01 pv.01
+logvol / --fstype xfs --name=lv01 --vgname=rootvg01 --size=1 --grow
+rootpw --iscrypted $ROOTPASS
+
+%packages --nobase --ignoremissing
+@core
+%end
+
+EOKSFILE
+
+chmod a+r /var/www/html/ks/"$DSLUG"
+
+# ==============
+debuge "Create PXE boot menu"
+
+cat << EOMENU > /tftpboot/pxelinux.cfg/default
+default menu.c32
+prompt 0
+timeout 100
+MENU TITLE PXE Start
+
+LABEL $DSLUG
+MENU LABEL $DISTRO
+KERNEL $DSLUG/$KERNEL
+APPEND initrd=$DSLUG/$BOOTIMG boot=casper netboot=nfs nfsroot=$SERVERIP:/srv/install
+
+EOMENU
+
+# =============
+
+debuge "Restart services"
+# TODO - adapt for systemd
+
+service isc-dhcp-server restart
+service xinetd restart
+service nfs-kerner-server restart
