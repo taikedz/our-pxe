@@ -283,7 +283,7 @@ mkdir /tftpboot/netboot
 debuge "NFS kernel server setup"
 
 mkdir /srv/install
-echo "/srv/install   ${IPBASE}.0/24(ro,async,no_root_squash,no_subtree_check)" >> /etc/exports
+echo "/srv/install/$DSLUG   ${IPBASE}.0/24(ro,async,no_root_squash,no_subtree_check)" >> /etc/exports
 
 # TODO adapt for systemd
 service nfs-kernel-server start
@@ -362,7 +362,7 @@ MENU TITLE PXE Start
 LABEL $DSLUG
 MENU LABEL $DISTRO
 KERNEL $DSLUG/$KERNEL
-APPEND initrd=$DSLUG/$BOOTIMG boot=casper netboot=nfs nfsroot=$SERVERIP:/srv/install ks=http://$SERVERIP/ks/${DSLUG}.ks
+APPEND initrd=$DSLUG/$BOOTIMG boot=casper netboot=nfs nfsroot=$SERVERIP:/srv/install/$DSLUG ks=http://$SERVERIP/ks/${DSLUG}.ks
 
 EOMENU
 
