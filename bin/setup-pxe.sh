@@ -19,6 +19,8 @@ DSLUG=
 KERNEL=
 BOOTIMG=
 
+TOSEC=3 # timeout of PXE menu
+
 VERBOSE=no
 ISOMODE=mount # copy or mount iso contents?
 
@@ -55,6 +57,10 @@ Optional
 	-hi IPADDR
 		higher of range of IP space for DHCP
 		default: using the IPADDR, x.x.x.255
+
+	-tosec SECONDS
+		Number of seconds to wait until timing out the PXE menu and loading default
+		Default is $TOSEC seconds
 
 Mode switches
 
@@ -149,6 +155,16 @@ case "$ARG" in
 	DSLUG=$(distroslug $(basename "$ISOFILE"))
 	shift
 	;;
+-tosec)
+	numpat='^[0-9]+$'
+	if [[ ! "$1" =~ $numpat ]]; then
+		faile "Not a number: $1"
+		exit 4
+	fi
+	TOSEC=$1
+	shift
+	;;
+
 
 # Mode switches
 --verbose)
@@ -357,9 +373,9 @@ chmod a+r /var/www/html/ks/"$DSLUG".cfg
 debuge "Create PXE boot menu"
 
 cat << EOMENU > /tftpboot/pxelinux.cfg/default
-default menu.c32
+default localboot
 prompt 0
-timeout 100
+timeout ${TOSEC}0
 MENU TITLE PXE Start
 
 LABEL $DSLUG
