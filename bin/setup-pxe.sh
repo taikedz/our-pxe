@@ -305,16 +305,17 @@ else
 fi
 
 if [[ ! -d "/srv/install/$DSLUG/dists" ]]; then
-	warne "You do not have the '/dists' directory in your install folder; Ubuntu installation may fail"
+	faile "You do not have the '/dists' directory in your install folder; Ubuntu installations would fail. Abort."
+	exit 2
 fi
 
 # ==============
 debuge "Get kernel and initrd image"
 
 mkdir "/tftpboot/$DSLUG"
-KERNEL=$(basename $(ls /srv/install/$DSLUG/vmlinu*))
-BOOTIMG=$(basename $(ls /srv/install/$DSLUG/initrd*))
-cp /srv/install/$DSLUG/$KERNEL /srv/install/$DSLUG/$BOOTIMG "/tftpboot/$DSLUG"
+KERNEL=$(basename $(ls /srv/install/$DSLUG/casper/vmlinu*))
+BOOTIMG=$(basename $(ls /srv/install/$DSLUG/casper/initrd*))
+cp /srv/install/$DSLUG/casper/$KERNEL /srv/install/$DSLUG/casper/$BOOTIMG "/tftpboot/$DSLUG"
 
 # ==============
 debuge "Make kickstart file"
