@@ -299,14 +299,6 @@ cp -v /usr/lib/syslinux/{pxelinux.0,menu.c32,memdisk,mboot.c32,chain.c32} /tftpb
 mkdir /tftpboot/pxelinux.cfg
 mkdir /tftpboot/netboot
 
-# ==============
-debuge "NFS kernel server setup"
-
-mkdir /srv/install
-echo "/srv/install/$DSLUG   ${IPBASE}.0/24(ro,async,no_root_squash,no_subtree_check)" >> /etc/exports
-
-# TODO adapt for systemd
-service nfs-kernel-server start
 
 # ==============
 debuge "Get DVD contents"
@@ -328,6 +320,15 @@ if [[ ! -d "/srv/install/$DSLUG/dists" ]]; then
 	faile "You do not have the '/dists' directory in your install folder; Ubuntu installations would fail. Abort."
 	exit 2
 fi
+
+# ==============
+debuge "NFS kernel server setup"
+
+mkdir /srv/install
+echo "/srv/install/$DSLUG   ${IPBASE}.0/24(ro,async,no_root_squash,no_subtree_check)" >> /etc/exports
+
+# TODO adapt for systemd
+service nfs-kernel-server start
 
 # ==============
 debuge "Get kernel and initrd image"
