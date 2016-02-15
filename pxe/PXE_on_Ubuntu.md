@@ -1,46 +1,46 @@
 # Setting up a PXE Server on Ubuntu
 
-These instructions provide a detailed run-down of the what's and why's of creating a Ubuntu PXE server, for serving Ubuntu installers.
+These instructions provide a detailed run-down of the what's and why's of creating a Ubuntu PXE server, for serving Ubuntu installers SPECIFICALLY. Each distro has its own little quirks and variations, so there's no real one-size-fits all, despite what many guides out there seem to try and do. Maybe it's just that distros have been gradually growing apart in their installers and kernel flavours. Maybe it's just untested recycled documentation.
 
 There are still some things to smooth out as of writing (2016-02-13) but for the most part I'm nearly there.
 
-I have decided to go into detail of the environment setup due to the immense pain I've had with other guides around the internet which tell you to do things without telling you why, what specific environments, what snippets are substitutable and which are not; and me ending up with non-working PXE systems with very little ability to troublehoot.
+I have decided to go into detail of the environment setup due to the immense pain I've had with other guides around the internet which tell you to do things without telling you why, with regard to your environment, what snippets are substitutable and which are not; and me ending up with non-working PXE systems with very little ability to troublehoot.
 
-The final piece I need to solve now is how to configure the Kickstart file, or how to server a preseed file instead.
+The final piece I need to solve now is how to configure the Kickstart file, or how to serve a preseed file instead.
 
-These instructions should work foro the most part though, and I'll be looking at automating as much of this as possible by way of a bash script so that, finally, a PXE server setup is just a few commands away. Once and for all.
+These instructions should work for the most part though, and I'll be looking at automating as much of this as possible by way of a bash script so that, finally, a PXE server setup is just a few commands away. Once and for all.
 
 ## Test Environment
 
 I did the deployment of the PXE server itself on a Ubuntu 14.04 server i386 in VirtualBox 4.3.34 ; and chose to deploy a Ubuntu 15.04 i386 ISO image arbitrarily.
 
-For networking, you need NAT Internal during PXE booting; you can use NAT regular so as to be able to pull from the internet. I need to test using both a NAT Internal and a NAT at the same time on the server instance to see if taht works, but I see no reason why not.
+For networking, you need NAT Internal during PXE booting; you can use NAT regular so as to be able to pull from the internet. On the server, you can have one card NAT Internal and the other NAT, but you will first have to edit `/etc/network/interfaces` and copy the eth0 settings to an eth1 configuration, then reboot.
 
-Use the IP address of the NAT Internal for the DHCP configuration. Typically in VirtualBox this will be `10.0.2.*`
+Use the IP address of the NAT Internal for the DHCP configuration. Typically in VirtualBox this will be `10.0.3.*` or something.
 
 ## Firewall requirements
 
 You SHOULD be doing this on an internal network so firewall security should not need to be too stringent. That being said if you want to be sure, you need to allow INPUT on at least port 69 (tftpd) and the file server port (80 for the example below, served over HTTP), and port 67 (DHCP); you will also need to allow ports 111 and 2049 for the NFS server.
 
-Note that the IP `192.168.1.199` represents the IP of the PXE server we are configuring. Where encountered, replace it with the appropriate IP
+Note that the IP `10.0.3.199` in this guide represents the IP of the PXE server we are configuring. Where encountered, replace it with the appropriate IP
 
-If this is a VirtualBox VM, use a "NAT Network" adapter for testing with, and ensure that both the server and client use the same custom network (this is set up in the VBox main preferences). If you are using a different solution, you essentially need to ensure the two machiens are on the same subnetwork.
+If this is a VirtualBox VM, use a "NAT Network" adapter for testing with, and ensure that both the server and client use the same custom network (this is set up in the VBox main preferences). If you are using a different solution, you essentially need to ensure the two machines are on the same subnetwork.
 
-Ensure that there are no other machines than your PXE server and its client during your preliminary tests.
+Ensure that there are no other machines on the subnet, aside from your PXE server and its client during your preliminary tests.
 
 ## Install required packages
 
 	apt-get install isc-dhcp-server tftp tftpd apache2 syslinux nfs-kernel-server
 
-* The DHCP server allows the target PXE client to get an IP from our server specifically - not sure if this is a requirement for the PXE broadcast to be recognized...
+* The DHCP server allows the target PXE client to get an IP from our server specifically, and for the PXE server to advertise itself.
 
 * TFTP is a lightweight implementation of a subset of FTP to allow minimal code to be implemented for embedded firmware, or that is what I understand. PXE boot specifically looks for TFTP, not regular FTP, so this is a requirement.
 
-* Apache is being used to server the Kickstart files. You can choose an alternative as required - for example, nginx, or a FTP server.
+* Apache is being used to serve the Kickstart files. You can choose an alternative as required - for example, nginx, or a FTP server.
 
 * NFS is selected here as the means by which we will be serving the installation files over the internal network. For some systems it is optional; for Ubuntu as the target OS to be installed, it is a requirement.
 
-* `syslinux` contains a set of bootloaders, some of which we want for creating our setup. I do not remember which problem this solved. Whooops.
+* `syslinux` contains a set of bootloaders, some of which we want for creating our setup. I forgot to document which problem this solved. Whoops.
 
 ## Configure DHCP
 
@@ -61,20 +61,20 @@ Add the following near the top; comment out any conflicting items in the file.
 	# typically if your ip is of the form a.b.c.d
 	# the subnet woudl likely be a.b.c.0 - specifically the zero
 	# with a subnet mask of 255.255.255.0
-	subnet 192.168.1.0 netmask 255.255.255.0 {
+	subnet 10.0.3.0 netmask 255.255.255.0 {
 		# this is a custom range, on the same subnet as your PXE server
-		range 192.168.1.200 192.168.1.250;
+		range 10.0.3.200 10.0.3.250;
 
 		# our IP:
-		option domain-name-servers 192.168.1.199;
+		option domain-name-servers 10.0.3.199;
 		option domain-name "mydomain.home"; # just because, instructions.
 
 		# client to route traffic via this pxe server
-		option routers 192.168.1.199;
+		option routers 10.0.3.199;
 		default-lease-time 600;
 		max-lease-time 7200;
 		
-		next-server 192.168.1.199;
+		next-server 10.0.3.199;
 		filename "pxelinux.0";
 	}
 
@@ -114,25 +114,29 @@ If the file did not exist, simply create it with the following contents:
 
 ### Setup the NFS kernel server
 
+Make a directory where you will mount the ISO, and specify its export.
+
 	mkdir /srv/install
 
 Edit /etc/exports and add the line:
 
-	/srv/install   192.168.1.0/24(ro,async,no_root_squash,no_subtree_check) 
+	/srv/install   10.0.3.0/24(ro,async,no_root_squash,no_subtree_check) 
+
+The export path MUST be a mountable node, so if you mount two ISOs, to `/srv/install/lubuntu` and `/srv/install/xubuntu` you MUST specify a line for each of them - it is not sufficient to just provide `/srv/install` on its own.
 
 Start the kernel service
 
-	service nfs-kerner-server start
+	service nfs-kernel-server start
 
 ## Get the DVD contents
 
 You can either mount the DVD in-place
 
-	mount -o loop ./path/to/dvd/iso /srv/install
+	mount -o mode=755 ./path/to/dvd/iso /srv/install
 
 Or you can full-on copy the contents as appropriate
 
-	mount -o loop ./path/to/dvd.iso /mnt
+	mount -o mode=755 ./path/to/dvd.iso /mnt
 	cp -rv /mnt/* /srv/install
 	umount /mnt
 
@@ -140,7 +144,7 @@ Check that you have the `/mnt/dists` directory as provided by the DVD. If you do
 
 Not all Ubuntu distro copies have this - notably Ubuntu Server does not. Copy it from a desktop Ubuntu variant perhaps [ untested (2016-02-13) ]
 
-## Get the network boot kernel and image
+## Get the boot kernel and image
 
 Copy the boot images to `/tftpboot`
 
@@ -163,7 +167,7 @@ Note - the URL must specify the IP address - using the server's network name wil
 	auth --useshadow --enablemd5
 	services --enabled=NetworkManager, sshd
 	eula --agreed
-	nfs --server="192.168.1.199" --dir="/srv/install"
+	nfs --server="10.0.3.199" --dir="/srv/install"
 
 	bootloader --location=mbr
 	zerombr
@@ -195,7 +199,7 @@ Edit `/tftpboot/pxelinux.cfg/default`
 	LABEL ubuntu1504
 	MENU LABEL Ubuntu 15.04
 	KERNEL kernels15.04x32/vmlinuz
-	APPEND initrd=kernels15.04x32/initrd.lz boot=casper netboot=nfs nfsroot=192.168.1.199:/srv/install
+	APPEND initrd=kernels15.04x32/initrd.lz boot=casper only-ubiquity netboot=nfs nfsroot=10.0.3.199:/srv/install ks=http://10.0.3.199/ks/ubuntu1504x32.cfg
 
 ## Restart the services
 
@@ -203,7 +207,7 @@ Restart any services where you've made changes to the configuration files.
 
 	service isc-dhcp-server restart
 	service xinetd restart
-	service nfs-kerner-server restart
+	service nfs-kernel-server restart
 
 If you want to make changes to `/srv/install` contents, it would be safest to stop the nfs-kernel-server service, as the service keeps open handles on the files.
 
@@ -241,6 +245,8 @@ When the Ubuntu server installer encounters an error, you can see details on tty
 * If the installer complains about "Bad mirror" (can't find archive), check that you are indeed using the server's IP address not its name in the pxelinux.cfg menu file
 
 * If the installer complains about "Bad mirror" (can't find archive), check that you have `/srv/install/ubuntu1504/dists/vivid/Release` (or trusty, precise, etc as appropriate)
+
+* If you drop to a busybox shell/initramfs prompt on boot from image, or if you get a mount failure message in a loop, the initramfs image could not find the files (here served under NFS) - check addresses and paths in your menu config, and that the NFS server is running
 
 ## Known issues
 
