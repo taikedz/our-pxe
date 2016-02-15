@@ -221,6 +221,7 @@ fi
 # =============
 
 debuge "Install required packages"
+apt-get update
 apt-get install isc-dhcp-server tftp tftpd apache2 syslinux nfs-kernel-server --assume-yes
 
 # =============
