@@ -83,7 +83,7 @@ function validip {
 }
 
 function distroslug {
-	echo "$@" | sed -r 's/[^a-zA-Z0-9._-]+/-/g'
+	echo "$@" | sed -r -e 's/[^a-zA-Z0-9._-]+/-/g' -e 's/\.iso$//'
 }
 
 function debuge {
@@ -321,7 +321,7 @@ debuge "Make kickstart file"
 
 mkdir /var/www/html/ks
 
-cat <<EOKSFILE > /var/www/html/ks/"$DSLUG"
+cat <<EOKSFILE > /var/www/html/ks/"$DSLUG".ks
 install
 lang en_GB.UTF-8
 keyboard uk
@@ -329,7 +329,7 @@ timezone Europe/London
 auth --useshadow --enablemd5
 services --enabled=NetworkManager, sshd
 eula --agreed
-nfs --server="192.168.1.199" --dir="/srv/install"
+nfs --server="$SERVERIP" --dir="/srv/install"
 
 bootloader --location=mbr
 zerombr
@@ -347,7 +347,7 @@ rootpw --iscrypted $ROOTPASS
 
 EOKSFILE
 
-chmod a+r /var/www/html/ks/"$DSLUG"
+chmod a+r /var/www/html/ks/"$DSLUG".ks
 
 # ==============
 debuge "Create PXE boot menu"
@@ -361,7 +361,7 @@ MENU TITLE PXE Start
 LABEL $DSLUG
 MENU LABEL $DISTRO
 KERNEL $DSLUG/$KERNEL
-APPEND initrd=$DSLUG/$BOOTIMG boot=casper netboot=nfs nfsroot=$SERVERIP:/srv/install
+APPEND initrd=$DSLUG/$BOOTIMG boot=casper netboot=nfs nfsroot=$SERVERIP:/srv/install ks=http://$SERVERIP/ks/${DSLUG}.ks
 
 EOMENU
 
