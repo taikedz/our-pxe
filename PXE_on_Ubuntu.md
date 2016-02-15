@@ -14,9 +14,14 @@ These instructions should work for the most part though, and I'll be looking at 
 
 I did the deployment of the PXE server itself on a Ubuntu 14.04 server i386 in VirtualBox 4.3.34 ; and chose to deploy a Ubuntu 15.04 i386 ISO image arbitrarily.
 
-For networking, you need NAT Internal during PXE booting; you can use NAT regular so as to be able to pull from the internet. On the server, you can have one card NAT Internal and the other NAT, but you will first have to edit `/etc/network/interfaces` and copy the eth0 settings to an eth1 configuration, then reboot.
+For networking, you need NAT Network during PXE booting; you can use a NAT regular card so as to be able to pull from the internet. On the server, you can have one card as "NAT Network" and the other "NAT", but you will first have to edit `/etc/network/interfaces` and copy the eth0 settings to an eth1 configuration, then reboot.
 
-Use the IP address of the NAT Internal for the DHCP configuration. Typically in VirtualBox this will be `10.0.3.*` or something.
+If you switch a NIC between "NAT" and "NAT Network" or even "Bridged", you need to bring that network down and back up again, for example
+
+	ifdown eth1
+	ifup eth1
+
+Use the IP address of the NAT Network for the DHCP configuration. Typically in VirtualBox this will be `10.0.3.*` or something.
 
 ## Firewall requirements
 
@@ -193,13 +198,29 @@ Edit `/tftpboot/pxelinux.cfg/default`
 
 	default menu.c32
 	prompt 0
-	timeout 100
+	timeout 50
+	ONTIMEOUT local
 	MENU TITLE My PXE Menu
 	
 	LABEL ubuntu1504
 	MENU LABEL Ubuntu 15.04
 	KERNEL kernels15.04x32/vmlinuz
 	APPEND initrd=kernels15.04x32/initrd.lz boot=casper only-ubiquity netboot=nfs nfsroot=10.0.3.199:/srv/install ks=http://10.0.3.199/ks/ubuntu1504x32.cfg
+
+	LABEL local
+	MENU LABEL Boot from Hard drive
+
+The timeout is the number of _tenths_ of seconds to wait until timing out.
+
+The final option, local, boots from the hard drive. Typically, it brings up the GRUB menu. You may need to configure the installed system's grub:
+
+	sed -r -e 's/^(GRUB_TIMEOUT).+$/\1=1/' -i /etc/default/grub
+	update-grub
+	reboot
+
+This wil cause the GRUB to timeout immediately and boot into the local system.
+
+The kickstart option `ks=` does not currently work - working on it.
 
 ## Restart the services
 
