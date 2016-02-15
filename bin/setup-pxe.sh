@@ -312,9 +312,9 @@ fi
 debuge "Get kernel and initrd image"
 
 mkdir "/tftpboot/$DSLUG"
-KERNEL=$(basename $(ls /srv/install/vmlinu*))
-BOOTIMG=$(basename $(ls /srv/install/initrd*))
-cp /srv/install/$KERNEL /srv/install/$BOOTIMG "/tftpboot/$DSLUG"
+KERNEL=$(basename $(ls /srv/install/$DSLUG/vmlinu*))
+BOOTIMG=$(basename $(ls /srv/install/$DSLUG/initrd*))
+cp /srv/install/$DSLUG/$KERNEL /srv/install/$DSLUG/$BOOTIMG "/tftpboot/$DSLUG"
 
 # ==============
 debuge "Make kickstart file"
