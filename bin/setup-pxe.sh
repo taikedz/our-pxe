@@ -322,7 +322,7 @@ debuge "Make kickstart file"
 
 mkdir /var/www/html/ks
 
-cat <<EOKSFILE > /var/www/html/ks/"$DSLUG".ks
+cat <<EOKSFILE > /var/www/html/ks/"$DSLUG".cfg
 install
 lang en_GB.UTF-8
 keyboard uk
@@ -330,7 +330,7 @@ timezone Europe/London
 auth --useshadow --enablemd5
 services --enabled=NetworkManager, sshd
 eula --agreed
-nfs --server="$SERVERIP" --dir="/srv/install"
+nfs --server="$SERVERIP" --dir="/srv/install/$DSLUG"
 
 bootloader --location=mbr
 zerombr
@@ -348,7 +348,7 @@ rootpw --iscrypted $ROOTPASS
 
 EOKSFILE
 
-chmod a+r /var/www/html/ks/"$DSLUG".ks
+chmod a+r /var/www/html/ks/"$DSLUG".cfg
 
 # ==============
 debuge "Create PXE boot menu"
@@ -362,7 +362,12 @@ MENU TITLE PXE Start
 LABEL $DSLUG
 MENU LABEL $DISTRO
 KERNEL $DSLUG/$KERNEL
-APPEND initrd=$DSLUG/$BOOTIMG boot=casper netboot=nfs nfsroot=$SERVERIP:/srv/install/$DSLUG ks=http://$SERVERIP/ks/${DSLUG}.ks
+APPEND initrd=$DSLUG/$BOOTIMG boot=casper only-ubiquity netboot=nfs nfsroot=$SERVERIP:/srv/install/$DSLUG ks=http://$SERVERIP/ks/${DSLUG}.ks
+
+LABEL $DSLUG
+MENU LABEL $DISTRO Manual
+KERNEL $DSLUG/$KERNEL
+APPEND initrd=$DSLUG/$BOOTIMG boot=casper only-ubiquity netboot=nfs nfsroot=$SERVERIP:/srv/install/$DSLUG
 
 EOMENU
 
