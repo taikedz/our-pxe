@@ -377,17 +377,22 @@ cat << EOMENU > /tftpboot/pxelinux.cfg/default
 default menu.c32
 prompt 0
 timeout ${TOSEC}0
+ONTIMEOUT local
 MENU TITLE PXE Start
 
-LABEL $DSLUG
+LABEL $DSLUG-auto
 MENU LABEL $DISTRO
 KERNEL $DSLUG/$KERNEL
 APPEND initrd=$DSLUG/$BOOTIMG boot=casper only-ubiquity netboot=nfs nfsroot=$SERVERIP:/srv/install/$DSLUG ks=http://$SERVERIP/ks/${DSLUG}.ks
 
-LABEL $DSLUG
+LABEL $DSLUG-manual
 MENU LABEL $DISTRO Manual
 KERNEL $DSLUG/$KERNEL
 APPEND initrd=$DSLUG/$BOOTIMG boot=casper only-ubiquity netboot=nfs nfsroot=$SERVERIP:/srv/install/$DSLUG
+
+LABEL local
+MENU LABEL Boot from HDD
+localboot 0
 
 EOMENU
 
