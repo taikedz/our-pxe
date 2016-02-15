@@ -209,10 +209,13 @@ apt-get install isc-dhcp-server tftp tftpd apache2 syslinux nfs-kernel-server --
 
 # =============
 debuge "DNS setup"
-mv /etc/dhcp/dhcpd.conf{,.bak}
+if [[ ! -f /etc/dhcp/dhcpd.conf.base ]]; then
+	debuge "Original backup of dhcpd.conf"
+	mv /etc/dhcp/dhcpd.conf{,.base}
+fi
 
 dbuge "$(ls /etc/dhcp)"
-cat <<EOF >> /etc/dhcp/dhcpd.conf
+cat <<EOF > /etc/dhcp/dhcpd.conf
 ddns-update-style interim;
 ignore client-updates;
 authoritative;
@@ -242,7 +245,7 @@ subnet ${IPBASE}.0 netmask ${NETMASK} {
 }
 EOF
 
-grep -v "ddns-update-style" /etc/dhcp/dhcpd.conf.bak >> /etc/dhcp/dhcpd.conf
+grep -v "ddns-update-style" /etc/dhcp/dhcpd.conf.base >> /etc/dhcp/dhcpd.conf
 
 # ================
 debuge "Setup TFTPd via xinetd"
