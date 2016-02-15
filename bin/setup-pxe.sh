@@ -374,7 +374,7 @@ chmod a+r /var/www/html/ks/"$DSLUG".cfg
 debuge "Create PXE boot menu"
 
 cat << EOMENU > /tftpboot/pxelinux.cfg/default
-default localboot
+default menu.c32
 prompt 0
 timeout ${TOSEC}0
 MENU TITLE PXE Start
