@@ -261,6 +261,8 @@ When the Ubuntu server installer encounters an error, you can see details on tty
 
 * If your machine does not boot from PXE, or complains that no boot medium is found, powercycle it. For some reason, sometimes the PXE broadcast is not detected - this could be a network interference, PXE server declares itself to the client via DHCP packets
 
+* If your machine does not boot from PXE, or complains that no boot medium is found, check that the host and the PXE server are on a subnetwork where the PXE server can be the "authoritative" server, or a significantly better response time than the main DHCP server. The client chooses which DHCP offer to take up, but if the time taken by the DHCP offers to return to a given host is too close, the result can be non-deterministic.
+
 * If you manage to get the PXE menu but it just repeats the countdown ad infinitam, check for typos in the boot menu `/tftpboot/pxelinux.cfg/default`
 
 * If the installer complains about "Bad mirror" (can't find archive), check that you are indeed using the server's IP address not its name in the pxelinux.cfg menu file
@@ -269,15 +271,19 @@ When the Ubuntu server installer encounters an error, you can see details on tty
 
 * If you drop to a busybox shell/initramfs prompt on boot from image, or if you get a mount failure message in a loop, the initramfs image could not find the files (here served under NFS) - check addresses and paths in your menu config, and that the NFS server is running
 
+* [obsolete - fix with NFS] Boot from image from DVD fails with cannot find media at /dev/sr0; this is because the casper boot option expects something to be locally attached. The only way round this seems to be to use a kernel-nfs share that's properly configured, or to re-work the initrd image's scripts.
+
+* [obsolete - see note] Ubuntu installation fails at "Install the system" step; from what I find on mailing lists, there's an issue with apt trying to get files from the repository under the "security" section (not included on the DVD), and so the installer bails. Need to deactivate this, or redirect this. -- DEPRECATED this was because I was using the kernel and image from mini.iso, which expects a ubuntu server image
+
+
 ## Known issues
 
 * The current iteration of this document should get you to a fully working PXE boot, but the configuration of the Kickstart file needs tweaking, as it just lands us in the live session.
 
 * I don't know how to add extra options to the kickstart file - not sure where it's properly documented, but I will find this out and send on
 
-### Unresolved dead issues
-
-* [obsolete - fix unknown] Boot from image from DVD fails with cannot find media at /dev/sr0; this is because the casper boot option expects something to be locally attached. The only way round this seems to be to use a kernel-nfs share that's properly configured, or to re-work the initrd image's scripts. In the Kickstart file, we've specified the URL, but that only takes effect after casper finishes starting itself up. Not sure there's any other way of having an HTTP link mounted at a filesystem at this point. Kernel NFS it is.
-
-* [obsolete - see note] Ubuntu installation fails at "Install the system" step; from what I find on mailing lists, there's an issue with apt trying to get files from the repository under the "security" section (not included on the DVD), and so the installer bails. Need to deactivate this, or redirect this. -- DEPRECATED this was because I was using the kernel and image from mini.iso, which expects a ubuntu server image
+* DHCP leases - if you want to troubleshoot DHCP and PXE boot advertising, you can open up a workstation's firewall on ports 67 and 68 (input) and run the following
+	* `sudo tcpdump -i wlan0 -nev udp port 68 > review_file.txt`
+	* This will dump the chatter produced when a new machine comes online and you will be able to see who's saying what
+	* Currently investigating troubelshooting prioritization of leases, when there are more than 1 DHCP server online
 
